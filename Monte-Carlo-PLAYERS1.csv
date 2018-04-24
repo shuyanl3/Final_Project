@@ -1,0 +1,24 @@
+PLAYERS,POSITION,PERFORMANCE(This Season),PERFORMANCE(Past),FOULS,HEALTH
+Player1,Goalkeeper,NA,80,0,0
+Player2,Goalkeeper,NA,85,0,1
+Player3,Goalkeeper,NA,83,0,0
+Player4,Goalkeeper,96,90,0,0
+Player5,Defender,64,95,1,0
+Player6,Defender,NA,77,0,0
+Player7,Defender,98,68,0,0
+Player8,Defender,NA,92,0,1
+Player9,Defender,90,95,0,0
+Player10,Defender,83,82,0,0
+Player11,Defender,85,86,0,0
+Player12,Midfielder,88,92,0,0
+Player13,Midfielder,NA,94,0,0
+Player14,Midfielder,98,89,0,1
+Player15,Midfielder,NA,79,0,0
+Player16,Midfielder,83,65,0,0
+Player17,Forward,84,72,0,0
+Player18,Forward,65,81,0,0
+Player19,Forward,NA,97,1,0
+Player20,Forward,92,93,0,0
+Player21,Forward,NA,92,0,1
+Player22,Forward,98,92,1,0
+Player23,Forward,93,90,1,0
