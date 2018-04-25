@@ -1,5 +1,5 @@
 import csv
-
+from numpy.random import choice
 
 class Team:
     Name = ''
@@ -71,5 +71,77 @@ if __name__ == '__main__':
     print(teamA.Home_court)
     print(teamA.variance)
 
+def normalize_Numbers(number_list):
+    normalized_result = []
+    sum = 0
+    for i in number_list:
+        sum += i
+    for i in number_list:
+        normalized_result.append(i/sum)
+    return normalized_result
+
+
+
+
+def choose_line_ups(team_name,player_file,team_file):
+
+    # draw a formation
+    team = Team(team_name)
+    team.read_from_file(player_file,team_file)
+    formation_list = []
+    for i in team.Formation:
+        formation = ""
+        for s in i:
+          formation += str(s)
+        formation_list.append(formation)
+    formation_weight = normalize_Numbers(list(team.Formation.values()))
+    draw_formation = choice(formation_list, 1, p=formation_weight)
+    draw_formation = tuple(map(tuple, draw_formation))[0]
+    formation_outcome = []
+    for e in draw_formation:
+        formation_outcome.append(int(e))
+
+    # take the fouls and health condition into consideration
+    defenders = []
+    midfields = []
+    forwards = []
+    goalkeeper = []
+    defenders_weights = []
+    midfields_weights = []
+    forwards_weights = []
+    goalkeeper_weights = []
+    for player in team.Players:
+        weight = 1
+        if player['FOULS'] == True:
+            weight = weight * 0.7
+        if player['HEALTH'] == True:
+            weigth = weight * 0.6
+        if player['POSITION'] == 'Goalkeeper':
+            goalkeeper.append(player.get('Name'))
+            goalkeeper_weights.append(weight)
+        elif player['POSITION'] == 'Defender':
+            defenders.append(player.get('Name'))
+            defenders_weights.append(weight)
+        elif player['POSITION'] == 'Midfielder':
+            midfields.append(player.get('Name'))
+            midfields_weights.append(weight)
+        elif player['POSITION'] == 'Forward':
+            forwards.append(player.get('Name'))
+            forwards_weights.append(weight)
+
+    goalkeeper_weights = normalize_Numbers(goalkeeper_weights)
+    defenders_weights = normalize_Numbers(defenders_weights)
+    midfields_weights = normalize_Numbers(midfields_weights)
+    forwards_weights = normalize_Numbers(forwards_weights)
+
+    goalkeeper_lineup = list(choice(goalkeeper,1,replace= False, p = goalkeeper_weights))
+    defenders_lineup = list(choice(defenders,formation_outcome[0],replace= False, p = defenders_weights))
+    midfields_lineup = list(choice(midfields,formation_outcome[1],replace= False,p = midfields_weights))
+    forwards_lineup = list(choice(forwards,formation_outcome[2],replace= False,p = forwards_weights))
+
+    return goalkeeper_lineup, defenders_lineup, midfields_lineup, forwards_lineup
+
+
+print(choose_line_ups('Team A','Monte-Carlo-PLAYERS1.csv', 'Monte-Carlo-TEAM.csv'))
 
 
