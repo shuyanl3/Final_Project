@@ -83,18 +83,16 @@ def normalize_Numbers(number_list):
 
 
 
-def choose_line_ups(team_name,player_file,team_file):
+def choose_line_ups(formation,players):
 
     # draw a formation
-    team = Team(team_name)
-    team.read_from_file(player_file,team_file)
     formation_list = []
-    for i in team.Formation:
-        formation = ""
+    for i in formation:
+        forma = ""
         for s in i:
-          formation += str(s)
-        formation_list.append(formation)
-    formation_weight = normalize_Numbers(list(team.Formation.values()))
+          forma += str(s)
+        formation_list.append(forma)
+    formation_weight = normalize_Numbers(list(formation.values()))
     draw_formation = choice(formation_list, 1, p=formation_weight)
     draw_formation = tuple(map(tuple, draw_formation))[0]
     formation_outcome = []
@@ -110,7 +108,7 @@ def choose_line_ups(team_name,player_file,team_file):
     midfields_weights = []
     forwards_weights = []
     goalkeeper_weights = []
-    for player in team.Players:
+    for player in players:
         weight = 1
         if player['FOULS'] == True:
             weight = weight * 0.7
@@ -141,7 +139,16 @@ def choose_line_ups(team_name,player_file,team_file):
 
     return goalkeeper_lineup, defenders_lineup, midfields_lineup, forwards_lineup
 
+team_a = Team('Team A')
+team_a.read_from_file('Monte-Carlo-PLAYERS1.csv', 'Monte-Carlo-TEAM.csv')
+team_a_formation = team_a.Formation
+team_a_players = team_a.Players
 
-print(choose_line_ups('Team A','Monte-Carlo-PLAYERS1.csv', 'Monte-Carlo-TEAM.csv'))
+team_b = Team('Team B')
+team_b.read_from_file('Monte-Carlo-PLAYERS2.csv', 'Monte-Carlo-TEAM.csv')
+team_b_formation = team_b.Formation
+team_b_players = team_b.Players
 
-
+print("-----------------------------")
+print(choose_line_ups(team_a_formation,team_a_players))
+print(choose_line_ups(team_b_formation,team_b_players))
