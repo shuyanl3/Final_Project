@@ -1,5 +1,8 @@
 import csv
 from numpy.random import choice
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.mlab as mlab
 
 class Team:
     Name = ''
@@ -56,20 +59,17 @@ class Team:
                     self.Performance = row[6]
 
 
+team_a = Team('Team A')
+team_a.read_from_file('Monte-Carlo-PLAYERS1.csv', 'Monte-Carlo-TEAM.csv')
+team_a_formation = team_a.Formation
+team_a_players = team_a.Players
+
+team_b = Team('Team B')
+team_b.read_from_file('Monte-Carlo-PLAYERS2.csv', 'Monte-Carlo-TEAM.csv')
+team_b_formation = team_b.Formation
+team_b_players = team_b.Players
 
 
-# test
-if __name__ == '__main__':
-    teamA = Team('Team A')
-    teamA.read_from_file('Monte-Carlo-PLAYERS1.csv', 'Monte-Carlo-TEAM.csv')
-    for i in teamA.Players:
-        print(i)
-    print(teamA.Name)
-    print(teamA.Performance)
-    print(teamA.Formation)
-    print(teamA.coach)
-    print(teamA.Home_court)
-    print(teamA.variance)
 
 def normalize_Numbers(number_list):
     normalized_result = []
@@ -81,9 +81,12 @@ def normalize_Numbers(number_list):
     return normalized_result
 
 
-
-
 def choose_line_ups(formation,players):
+
+    count = 0
+    count_ = 0
+    score = 0
+    score_ = 0
 
     # draw a formation
     formation_list = []
@@ -137,18 +140,79 @@ def choose_line_ups(formation,players):
     midfields_lineup = list(choice(midfields,formation_outcome[1],replace= False,p = midfields_weights))
     forwards_lineup = list(choice(forwards,formation_outcome[2],replace= False,p = forwards_weights))
 
-    return goalkeeper_lineup, defenders_lineup, midfields_lineup, forwards_lineup
+    # extract the player performance after randomly choose
+    final_lineup = goalkeeper_lineup + defenders_lineup + midfields_lineup + forwards_lineup
+    performance_current = []
+    performance_past = []
 
-team_a = Team('Team A')
-team_a.read_from_file('Monte-Carlo-PLAYERS1.csv', 'Monte-Carlo-TEAM.csv')
-team_a_formation = team_a.Formation
-team_a_players = team_a.Players
+    for player in players:
+        for i in final_lineup:
+            if player['Name'] == i :
+                performance_current.append(player.get('PERFORMANCE(This Season)'))
+                performance_past.append(player.get('PERFORMANCE(Past)'))
 
-team_b = Team('Team B')
-team_b.read_from_file('Monte-Carlo-PLAYERS2.csv', 'Monte-Carlo-TEAM.csv')
-team_b_formation = team_b.Formation
-team_b_players = team_b.Players
+    #Calculate the player score
+    for i in performance_current:
+        if i != 'NA':
+            count += 1
+            score += int(i)
+    for i in performance_past:
+        if i != 'NA':
+            count_ += 1
+            score_ += int(i)
 
-print("-----------------------------")
-print(choose_line_ups(team_a_formation,team_a_players))
-print(choose_line_ups(team_b_formation,team_b_players))
+    avg_score = (float(score/count) + float(score_/count_))/2
+
+    return goalkeeper_lineup, defenders_lineup, midfields_lineup, forwards_lineup, avg_score
+
+
+
+
+#Calculate the result using Monte_Carlo
+
+win_count = 0
+lose_count = 0
+point_A = []
+point_B = []
+mean_A = 0
+mean_B = 0
+std_A = 0
+std_B = 0
+echo = 100
+
+for i in range(echo):
+
+    pointA = float(choose_line_ups(team_a_formation,team_a_players)[4])
+    pointB = float(choose_line_ups(team_b_formation,team_b_players)[4])
+    point_A.append(pointA)
+    point_B.append(pointB)
+
+    if pointA > pointB:
+        win_count += 1
+    else:
+        lose_count += 1
+
+mean_A = float(np.mean(np.asarray(point_A)))
+mean_B = float(np.mean(np.asarray(point_B)))
+std_A = float(np.std(np.asarray(point_A)))
+std_B = float(np.std(np.asarray(point_B)))
+
+print("WIN rate(A)", win_count/100)
+
+#print the graph (A)
+
+A = np.linspace(mean_A - 3*std_A, mean_A + 3*std_A, 100)
+plt.plot(A,mlab.normpdf(A, mean_A, std_A))
+
+plt.show()
+
+# B = np.linspace(mean_B - 3*std_B, mean_B + 3*std_B, 100)
+# plt.plot(B,mlab.normpdf(B, mean_B, std_B))
+#
+# plt.show()
+
+
+
+
+
+
