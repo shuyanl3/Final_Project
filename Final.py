@@ -171,39 +171,37 @@ def choose_line_ups(formation,players):
 #Calculate the result using Monte_Carlo
 
 win_count = 0
-lose_count = 0
-point_A = []
-point_B = []
-mean_A = 0
-mean_B = 0
-std_A = 0
-std_B = 0
+
+mean = 0
+std = 0
+win = []
 echo = 100
 
-for i in range(echo):
+for j in range(echo):
+    win_count = 0
+    for i in range(echo):
 
-    pointA = float(choose_line_ups(team_a_formation,team_a_players)[4])
-    pointB = float(choose_line_ups(team_b_formation,team_b_players)[4])
-    point_A.append(pointA)
-    point_B.append(pointB)
+        pointA = float(choose_line_ups(team_a_formation,team_a_players)[4])
+        pointB = float(choose_line_ups(team_b_formation,team_b_players)[4])
 
-    if pointA > pointB:
-        win_count += 1
-    else:
-        lose_count += 1
 
-mean_A = float(np.mean(np.asarray(point_A)))
-mean_B = float(np.mean(np.asarray(point_B)))
-std_A = float(np.std(np.asarray(point_A)))
-std_B = float(np.std(np.asarray(point_B)))
+        if pointA > pointB:
+            win_count += 1
 
-print("WIN rate(A)", win_count/100)
+    win.append(win_count/100)
+
+mean = float(np.mean(np.asarray(win)))
+std = float(np.std(np.asarray(win)))
+
+print("Average WIN rate(A):", mean)
+print("Standard deviation: ", std)
 
 #print the graph (A)
 
-A = np.linspace(mean_A - 3*std_A, mean_A + 3*std_A, 100)
-plt.plot(A,mlab.normpdf(A, mean_A, std_A))
-
+A = np.linspace(mean- 3* std, mean + 3*std, 100)
+plt.plot(A,mlab.normpdf(A, mean, std))
+plt.title('Monte Carlo Distribution (Team A win rate)')
+plt.text(0.60, 7, r'$\mu=0.73,\ \sigma=0.046$')
 plt.show()
 
 # B = np.linspace(mean_B - 3*std_B, mean_B + 3*std_B, 100)
