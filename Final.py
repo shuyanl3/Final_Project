@@ -193,8 +193,8 @@ for j in range(echo):
 mean = float(np.mean(np.asarray(win)))
 std = float(np.std(np.asarray(win)))
 
-print("Average WIN rate(A):", mean)
-print("Standard deviation: ", std)
+print("Average WIN rate(A):", round(mean*100,2))
+print("Standard deviation: ", round(std*100,2))
 
 #print the graph (A)
 
