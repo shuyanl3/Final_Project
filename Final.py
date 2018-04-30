@@ -3,6 +3,9 @@ from numpy.random import choice
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.mlab as mlab
+from threading import Thread
+import time
+
 
 class Team:
     Name = ''
@@ -70,14 +73,13 @@ team_b_formation = team_b.Formation
 team_b_players = team_b.Players
 
 
-
-def normalize_Numbers(number_list):
+def normalize_numbers(number_list):
     normalized_result = []
-    sum = 0
+    mysum = 0
     for i in number_list:
-        sum += i
+        mysum += i
     for i in number_list:
-        normalized_result.append(i/sum)
+        normalized_result.append(i/mysum)
     return normalized_result
 
 
@@ -95,7 +97,7 @@ def choose_line_ups(formation,players):
         for s in i:
           forma += str(s)
         formation_list.append(forma)
-    formation_weight = normalize_Numbers(list(formation.values()))
+    formation_weight = normalize_numbers(list(formation.values()))
     draw_formation = choice(formation_list, 1, p=formation_weight)
     draw_formation = tuple(map(tuple, draw_formation))[0]
     formation_outcome = []
@@ -113,10 +115,10 @@ def choose_line_ups(formation,players):
     goalkeeper_weights = []
     for player in players:
         weight = 1
-        if player['FOULS'] == True:
+        if player['FOULS']:
             weight = weight * 0.7
-        if player['HEALTH'] == True:
-            weigth = weight * 0.6
+        if player['HEALTH']:
+            weight = weight * 0.6
         if player['POSITION'] == 'Goalkeeper':
             goalkeeper.append(player.get('Name'))
             goalkeeper_weights.append(weight)
@@ -130,15 +132,15 @@ def choose_line_ups(formation,players):
             forwards.append(player.get('Name'))
             forwards_weights.append(weight)
 
-    goalkeeper_weights = normalize_Numbers(goalkeeper_weights)
-    defenders_weights = normalize_Numbers(defenders_weights)
-    midfields_weights = normalize_Numbers(midfields_weights)
-    forwards_weights = normalize_Numbers(forwards_weights)
+    goalkeeper_weights = normalize_numbers(goalkeeper_weights)
+    defenders_weights = normalize_numbers(defenders_weights)
+    midfields_weights = normalize_numbers(midfields_weights)
+    forwards_weights = normalize_numbers(forwards_weights)
 
-    goalkeeper_lineup = list(choice(goalkeeper,1,replace= False, p = goalkeeper_weights))
-    defenders_lineup = list(choice(defenders,formation_outcome[0],replace= False, p = defenders_weights))
-    midfields_lineup = list(choice(midfields,formation_outcome[1],replace= False,p = midfields_weights))
-    forwards_lineup = list(choice(forwards,formation_outcome[2],replace= False,p = forwards_weights))
+    goalkeeper_lineup = list(choice(goalkeeper, 1, replace=False, p=goalkeeper_weights))
+    defenders_lineup = list(choice(defenders, formation_outcome[0], replace=False, p=defenders_weights))
+    midfields_lineup = list(choice(midfields, formation_outcome[1], replace=False, p=midfields_weights))
+    forwards_lineup = list(choice(forwards, formation_outcome[2], replace=False, p=forwards_weights))
 
     # extract the player performance after randomly choose
     final_lineup = goalkeeper_lineup + defenders_lineup + midfields_lineup + forwards_lineup
@@ -147,11 +149,11 @@ def choose_line_ups(formation,players):
 
     for player in players:
         for i in final_lineup:
-            if player['Name'] == i :
+            if player['Name'] == i:
                 performance_current.append(player.get('PERFORMANCE(This Season)'))
                 performance_past.append(player.get('PERFORMANCE(Past)'))
 
-    #Calculate the player score
+    # Calculate the player score
     for i in performance_current:
         if i != 'NA':
             count += 1
@@ -166,51 +168,71 @@ def choose_line_ups(formation,players):
     return goalkeeper_lineup, defenders_lineup, midfields_lineup, forwards_lineup, avg_score
 
 
+# def wincount():
+#     global win_count
+#     pointA = float(choose_line_ups(team_a_formation, team_a_players)[4])
+#     pointB = float(choose_line_ups(team_b_formation, team_b_players)[4])
+#     if pointA > pointB:
+#         win_count += 1
 
 
-#Calculate the result using Monte_Carlo
+start_p = time.process_time()
+start = time.time()
 
-win_count = 0
-
-mean = 0
-std = 0
-win = []
-echo = 100
-
-for j in range(echo):
+if __name__ == '__main__':
+    # Calculate the result using Monte_Carlo
     win_count = 0
-    for i in range(echo):
+    mean = 0
+    std = 0
+    win = []
+    echo = 100
+    for j in range(echo):
+        win_count = 0
+        thread_list = []
 
-        pointA = float(choose_line_ups(team_a_formation,team_a_players)[4])
-        pointB = float(choose_line_ups(team_b_formation,team_b_players)[4])
+        for it in range(echo):
+
+            pointA = float(choose_line_ups(team_a_formation, team_a_players)[4])
+            pointB = float(choose_line_ups(team_b_formation, team_b_players)[4])
+
+            if pointA > pointB:
+                win_count += 1
+
+        #     thread_list.append(Thread(target=wincount, daemon=False))
+        #     thread_list[it].start()
+        #     if it % 4 == 0:
+        #        thread_list[it].join()
+        #
+        # for t in thread_list:
+        #     t.join()
+
+        win.append(win_count/100)
+
+    mean = float(np.mean(np.asarray(win)))
+    std = float(np.std(np.asarray(win)))
+
+    print("Average WIN rate(A):", round(mean*100, 2))
+    print("Standard deviation: ", round(std*100, 2))
+
+    # print the graph (A)
+
+    A = np.linspace(mean - 3 * std, mean + 3 * std, 100)
+    plt.plot(A, mlab.normpdf(A, mean, std))
+    plt.title('Monte Carlo Distribution (Team A win rate)')
+    plt.text(0.60, 7, r'$\mu=0.73,\ \sigma=0.046$')
+    plt.show()
+
+    # B = np.linspace(mean_B - 3*std_B, mean_B + 3*std_B, 100)
+    # plt.plot(B,mlab.normpdf(B, mean_B, std_B))
+    #
+    # plt.show()
 
 
-        if pointA > pointB:
-            win_count += 1
-
-    win.append(win_count/100)
-
-mean = float(np.mean(np.asarray(win)))
-std = float(np.std(np.asarray(win)))
-
-print("Average WIN rate(A):", round(mean*100,2))
-print("Standard deviation: ", round(std*100,2))
-
-#print the graph (A)
-
-A = np.linspace(mean- 3* std, mean + 3*std, 100)
-plt.plot(A,mlab.normpdf(A, mean, std))
-plt.title('Monte Carlo Distribution (Team A win rate)')
-plt.text(0.60, 7, r'$\mu=0.73,\ \sigma=0.046$')
-plt.show()
-
-# B = np.linspace(mean_B - 3*std_B, mean_B + 3*std_B, 100)
-# plt.plot(B,mlab.normpdf(B, mean_B, std_B))
-#
-# plt.show()
 
 
+elapsed_p = time.process_time() - start_p
+elapsed = time.time() - start
 
-
+print('\ntotal elapsed time: {:0.4f}s. Main process CPU time: {:0.4f}s\n'.format(elapsed, elapsed_p))
 
 
