@@ -172,9 +172,8 @@ if __name__ == '__main__':
     std = 0
     win = []
     echo = 100
-    for j in range(echo):
+    for j in range(1000):
         win_count = 0
-        thread_list = []
 
         for it in range(echo):
 
@@ -194,10 +193,15 @@ if __name__ == '__main__':
 
     # print the graph (A)
 
+    plt.hist(win)
+    plt.savefig('winRate_hist.png')
+    plt.close()
+
     A = np.linspace(mean - 3 * std, mean + 3 * std, 100)
     plt.plot(A, mlab.normpdf(A, mean, std))
     plt.title('Monte Carlo Distribution (Team A win rate)')
-    plt.text(0.60, 7, r'$\mu=0.73,\ \sigma=0.046$')
+    plt.text(0.60, 7, r'$\mu=%.2f,\ \sigma=%.2f$' % (round(mean*100, 2), round(std*100, 2)))
+    plt.savefig('winRate_normal.png')
     plt.show()
 
     # B = np.linspace(mean_B - 3*std_B, mean_B + 3*std_B, 100)

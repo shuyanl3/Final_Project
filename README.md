@@ -14,7 +14,7 @@ We simulate the soccer game of two teams: teamA and teamB. There are several fac
 -> team ranking: this attribute bases on the history data.
 
 Purpose:
-We want to find out which team has the larger probability to win. And by analyzing the stragtegy package they use, we generalize the pattern of winning team.
+We want to find out which team has the larger probability to win. And by analyzing the strategy package they use, we generalize the pattern of winning team.
 
 ## Simulation's variables of uncertainty
 
@@ -25,7 +25,8 @@ We want to find out which team has the larger probability to win. And by analyzi
 We write all the player data and team data by ourselves. And there is no other factors that can affect the game result.
 
 ## Analytical Summary of your findings: (e.g. Did you adjust the scenario based on previous simulation outcomes?  What are the management decisions one could make from your simulation's output, etc.)
-
+The output of our program is the win rate of teamA, RateA. The win rate of teamB is 1 - RateA.
+We ran Monte-Carlo simulation 100 times to get the average win rate, which is the predicted win rate. Then we ran this process for 1000 times to get a distribution of the predicted win rate. It is nearly normal distribution. The lower bound of the distribution is beyond 50%, which means we have a great confidence that the predicted winner of this match is A.
 
 
 ## Instructions on how to use the program:
