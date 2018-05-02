@@ -3,8 +3,6 @@ from numpy.random import choice
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.mlab as mlab
-from threading import Thread
-import time
 
 
 class Team:
@@ -62,17 +60,6 @@ class Team:
                     self.Performance = row[6]
 
 
-team_a = Team('Team A')
-team_a.read_from_file('Monte-Carlo-PLAYERS1.csv', 'Monte-Carlo-TEAM.csv')
-team_a_formation = team_a.Formation
-team_a_players = team_a.Players
-
-team_b = Team('Team B')
-team_b.read_from_file('Monte-Carlo-PLAYERS2.csv', 'Monte-Carlo-TEAM.csv')
-team_b_formation = team_b.Formation
-team_b_players = team_b.Players
-
-
 def normalize_numbers(number_list):
     normalized_result = []
     mysum = 0
@@ -83,7 +70,7 @@ def normalize_numbers(number_list):
     return normalized_result
 
 
-def choose_line_ups(formation,players):
+def choose_line_ups(formation, players):
 
     count = 0
     count_ = 0
@@ -168,19 +155,18 @@ def choose_line_ups(formation,players):
     return goalkeeper_lineup, defenders_lineup, midfields_lineup, forwards_lineup, avg_score
 
 
-# def wincount():
-#     global win_count
-#     pointA = float(choose_line_ups(team_a_formation, team_a_players)[4])
-#     pointB = float(choose_line_ups(team_b_formation, team_b_players)[4])
-#     if pointA > pointB:
-#         win_count += 1
-
-
-start_p = time.process_time()
-start = time.time()
-
 if __name__ == '__main__':
     # Calculate the result using Monte_Carlo
+    team_a = Team('Team A')
+    team_a.read_from_file('Monte-Carlo-PLAYERS1.csv', 'Monte-Carlo-TEAM.csv')
+    team_a_formation = team_a.Formation
+    team_a_players = team_a.Players
+
+    team_b = Team('Team B')
+    team_b.read_from_file('Monte-Carlo-PLAYERS2.csv', 'Monte-Carlo-TEAM.csv')
+    team_b_formation = team_b.Formation
+    team_b_players = team_b.Players
+
     win_count = 0
     mean = 0
     std = 0
@@ -197,14 +183,6 @@ if __name__ == '__main__':
 
             if pointA > pointB:
                 win_count += 1
-
-        #     thread_list.append(Thread(target=wincount, daemon=False))
-        #     thread_list[it].start()
-        #     if it % 4 == 0:
-        #        thread_list[it].join()
-        #
-        # for t in thread_list:
-        #     t.join()
 
         win.append(win_count/100)
 
@@ -226,13 +204,5 @@ if __name__ == '__main__':
     # plt.plot(B,mlab.normpdf(B, mean_B, std_B))
     #
     # plt.show()
-
-
-
-
-elapsed_p = time.process_time() - start_p
-elapsed = time.time() - start
-
-print('\ntotal elapsed time: {:0.4f}s. Main process CPU time: {:0.4f}s\n'.format(elapsed, elapsed_p))
 
 
